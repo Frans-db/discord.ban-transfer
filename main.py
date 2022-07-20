@@ -21,6 +21,13 @@ async def on_ready():
             guild_id  INTEGER                              NOT NULL,
             timestamp TIMESTAMP  DEFAULT CURRENT_TIMESTAMP NOT NULL
         );''')
+    cur.execute('''CREATE TABLE IF NOT EXISTS bans (
+            id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+            ban_list_id VARCHAR(8) NOT NULL,
+            user_id INTEGER,
+            reason TEXT
+        );''')
+    
     print('Initialisation done')
 
 
@@ -40,9 +47,19 @@ async def createList(ctx: Context):
 
     cur.execute('INSERT INTO ban_lists (id, user_id, guild_id) VALUES (?, ?, ?)',
                 (ban_list_id, user_id, guild_id))
+
+    query_bans = []
+    for ban in bans:
+        query_bans.append((
+            ban_list_id,
+            ban.user.id,
+            ban.reason,
+        ))
+    cur.executemany('INSERT INTO bans (ban_list_id, user_id, reason) VALUES (?, ?, ?)', query_bans)
+
     conn.commit()
 
-    await ctx.send(f'User {ctx.author} created ban list ({ban_list_id}) for server {ctx.guild}')
+    await ctx.send(f'User {ctx.author} created ban list ({ban_list_id}) for server {ctx.guild} with {len(query_bans)} users')
 
 
 @bot.command()
