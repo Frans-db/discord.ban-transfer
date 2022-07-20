@@ -51,9 +51,6 @@ async def createList(ctx: Context):
     user_id = ctx.author.id
     guild_id = ctx.guild.id
 
-    cur.execute('INSERT INTO ban_lists (id, user_id, guild_id) VALUES (?, ?, ?)',
-                (ban_list_id, user_id, guild_id))
-
     query_bans = []
     for ban in bans:
         query_bans.append((
@@ -61,6 +58,9 @@ async def createList(ctx: Context):
             ban.user.id,
             ban.reason,
         ))
+
+    cur.execute('INSERT INTO ban_lists (id, user_id, guild_id) VALUES (?, ?, ?)',
+                (ban_list_id, user_id, guild_id))
     cur.executemany(
         'INSERT INTO bans (ban_list_id, user_id, reason) VALUES (?, ?, ?)', query_bans)
 
@@ -157,7 +157,8 @@ async def banList(ctx: Context, ban_list_id: str):
     server_bans = await get_banned_list(ctx)
     server_ban_ids = [ban.user.id for ban in server_bans]
     # get bans from the list that have not been banned on this server
-    filtered_bans = [ban for ban in bans if ban[2] not in server_ban_ids][:max_bans]
+    filtered_bans = [ban for ban in bans if ban[2]
+                     not in server_ban_ids][:max_bans]
     await ctx.send(f'Starting banning of {len(filtered_bans)} users.')
     for i, (ban_id, ban_list_id, banned_user_id, reason) in enumerate(filtered_bans):
         banned_user = await bot.fetch_user(banned_user_id)
@@ -168,6 +169,7 @@ async def banList(ctx: Context, ban_list_id: str):
             message += f' Banned **{banned_user}** for **{reason if reason else "No Reason Given"}**'
         await ctx.send(message)
     await ctx.send('Done banning')
+
 
 @bot.command()
 @commands.is_owner()
@@ -188,7 +190,8 @@ async def unbanList(ctx: Context, ban_list_id: str):
     server_bans = await get_banned_list(ctx)
     server_ban_ids = [ban.user.id for ban in server_bans]
     # get bans from the list that have not been banned on this server
-    filtered_unbans = [ban for ban in bans if ban[2] in server_ban_ids][:max_bans]
+    filtered_unbans = [ban for ban in bans if ban[2]
+                       in server_ban_ids][:max_bans]
     await ctx.send(f'Starting unbanning of {len(filtered_unbans)} users.')
     for i, (ban_id, ban_list_id, banned_user_id, reason) in enumerate(filtered_unbans):
         banned_user = await bot.fetch_user(banned_user_id)
