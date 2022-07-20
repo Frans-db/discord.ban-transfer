@@ -43,7 +43,7 @@ async def get_banned_list(ctx: Context):
 
 
 @bot.command()
-@commands.is_owner()
+@commands.has_permissions(administrator=True)
 async def create(ctx: Context):
     '''Create a list of banned users for the current server'''
     bans = await get_banned_list(ctx)
@@ -71,7 +71,7 @@ async def create(ctx: Context):
 
 
 @bot.command()
-@commands.is_owner()
+@commands.has_permissions(administrator=True)
 async def lists(ctx: Context):
     '''Show lists created by you or created in this server'''
     # get context data
@@ -105,7 +105,7 @@ async def lists(ctx: Context):
 
 
 @bot.command()
-@commands.is_owner()
+@commands.has_permissions(administrator=True)
 async def view(ctx: Context, ban_list_id: str):
     '''Show banned users in a list'''
     # get ban list from database
@@ -142,7 +142,7 @@ async def view(ctx: Context, ban_list_id: str):
 
 
 @bot.command()
-@commands.is_owner()
+@commands.has_permissions(administrator=True)
 async def ban(ctx: Context, ban_list_id: str):
     '''Ban users in a list'''
     # get ban list from database
@@ -178,7 +178,7 @@ async def ban(ctx: Context, ban_list_id: str):
 
 
 @bot.command()
-@commands.is_owner()
+@commands.has_permissions(administrator=True)
 async def unban(ctx: Context, ban_list_id: str):
     '''Unban users in a list'''
     # get ban list from database
@@ -216,7 +216,7 @@ async def unban(ctx: Context, ban_list_id: str):
 
 
 @bot.command()
-@commands.is_owner()
+@commands.has_permissions(administrator=True)
 async def ping(ctx: Context):
     '''Show bot latency'''
     await ctx.send(f'Pong! {bot.latency:.2f} seconds')
