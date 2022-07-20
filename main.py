@@ -77,13 +77,13 @@ async def viewLists(ctx: Context):
 
     message = f'**Ban lists for user {ctx.author}**\n'
     for (ban_list_id, user_id, guild_id, timestamp) in user_lists:
-        guild = bot.get_guild(guild_id)
+        guild = await bot.fetch_guild(guild_id)
         message += f'{ban_list_id}, {ctx.author}, {guild}, {timestamp}\n'
     await ctx.send(message)
 
     message = f'**Ban lists for guild {ctx.guild}**\n'
     for (ban_list_id, user_id, guild_id, timestamp) in guild_lists:
-        user = bot.get_user(user_id)
+        user = await bot.fetch_user(user_id)
         message += f'{ban_list_id}, {user}, {ctx.guild}, {timestamp}\n'
     await ctx.send(message)
 
@@ -93,10 +93,23 @@ async def viewLists(ctx: Context):
 async def viewList(ctx: Context, ban_list_id: str):
     cur.execute('SELECT * FROM ban_lists WHERE id = ?', (ban_list_id, ))
     ban_list = cur.fetchone()
-    print(ban_list)
+    if ban_list is None:
+        await ctx.send(f'No ban list with id **{ban_list_id}** found')
+        return
+    ban_list_id, user_id, guild_id, timestamp = ban_list
+    if (user_id != ctx.author.id) and (guild_id != ctx.guild.id):
+        await ctx.send('Can\'t view ban lists that you didn\'t create or that weren\'t made in this server')
+        return
 
-
-
+    cur.execute('SELECT * FROM bans WHERE ban_list_id = ?', (ban_list_id, ))
+    bans = cur.fetchall()
+    user = await bot.fetch_user(user_id)
+    guild = await bot.fetch_guild(guild_id)
+    message = f'Ban list created by **{user}** for server **{guild}** at time {timestamp} with {len(bans)} bans:\n'
+    for id, ban_list_id, banned_user_id, reason in bans:
+        banned_user = await bot.fetch_user(banned_user_id)
+        message += f'Banned **{banned_user}** for **{reason if reason else "No Reason Given"}**\n'
+    await ctx.send(message)
 # Helper commands
 
 
