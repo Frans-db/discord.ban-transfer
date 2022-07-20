@@ -19,7 +19,7 @@ If you would rather host the bot yourself the next section explains how to do th
 4. Run `main.py`
 
 ## Using the bot
-Because this bot has the ability to ban many users currently only the server owner can use any of these commands. Due to API limitations the boy can only ban 1k members at a time.
+Because this bot has the ability to ban many users currently only the admins can use any of these commands. Due to API limitations the boy can only ban 1k members at a time.
 
 Commands:
 
