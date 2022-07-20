@@ -71,27 +71,30 @@ async def createList(ctx: Context):
 @bot.command()
 @commands.is_owner()
 async def viewLists(ctx: Context):
+    # get context data
     user_id = ctx.author.id
     guild_id = ctx.guild.id
-
+    # get ban lists for the user and the guild
     cur.execute('SELECT * FROM ban_lists WHERE user_id = ?', (user_id, ))
     user_lists = cur.fetchall()
     cur.execute('SELECT * FROM ban_lists WHERE guild_id = ?', (guild_id, ))
     guild_lists = cur.fetchall()
-
+    # table information
     headers = ['Ban List Id', 'User', 'Guild', 'Time']
-
+    # create table data for the user
     table_data = []
     for (ban_list_id, user_id, guild_id, timestamp) in user_lists:
         guild = await bot.fetch_guild(guild_id)
         table_data.append([ban_list_id, ctx.author, guild, timestamp])
+    # append to message
     message = f'**Ban lists for user {ctx.author}**\n'
     message += f"```{tabulate(table_data, headers=headers, tablefmt=table_format)}```\n"
-
+    # create table data for the guild
     table_data = []
     for (ban_list_id, user_id, guild_id, timestamp) in guild_lists:
         user = await bot.fetch_user(user_id)
         table_data.append([ban_list_id, user, ctx.guild, timestamp])
+    # append to message
     message += f'**Ban lists for guild {ctx.guild}**\n'
     message += f"```{tabulate(table_data, headers=headers, tablefmt=table_format)}```"
 
@@ -101,30 +104,39 @@ async def viewLists(ctx: Context):
 @bot.command()
 @commands.is_owner()
 async def viewList(ctx: Context, ban_list_id: str):
+    # get ban list from database
     cur.execute('SELECT * FROM ban_lists WHERE id = ?', (ban_list_id, ))
     ban_list = cur.fetchone()
+    # check if list exists
     if ban_list is None:
         await ctx.send(f'No ban list with id **{ban_list_id}** found')
         return
     ban_list_id, user_id, guild_id, timestamp = ban_list
+    # check if either user made the list, or the list was made in this server
     if (user_id != ctx.author.id) and (guild_id != ctx.guild.id):
         await ctx.send('Can\'t view ban lists that you didn\'t create or that weren\'t made in this server')
         return
-
-    cur.execute('SELECT * FROM bans WHERE ban_list_id = ?', (ban_list_id, ))
-    bans = cur.fetchall()
+    # get user who made the ban list and guild the ban list was made in
     user = await bot.fetch_user(user_id)
     guild = await bot.fetch_guild(guild_id)
-
+    # get bans from database
+    cur.execute('SELECT * FROM bans WHERE ban_list_id = ?', (ban_list_id, ))
+    bans = cur.fetchall()
+    # table information
     headers = ['User', 'Reason']
+    # create ban table data
     table_data = []
     for id, ban_list_id, banned_user_id, reason in bans:
         banned_user = await bot.fetch_user(banned_user_id)
-        table_data.append([banned_user, reason if reason else "No Reason Given"])
+        table_data.append(
+            [banned_user, reason if reason else "No Reason Given"])
+    # create message
     message = f'Ban list created by **{user}** for server **{guild}** at time {timestamp} with {len(bans)} bans:\n'
     message += f"```{tabulate(table_data, headers=headers, tablefmt=table_format)}```"
-    
+
     await ctx.send(message)
+
+
 # Helper commands
 
 
