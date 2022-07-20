@@ -213,12 +213,3 @@ async def ping(ctx: Context):
 
 if __name__ == '__main__':
     bot.run(TOKEN)
-
-"""
-ideas:
-getBans -> create a new BanList database entry with guild, user, date
-           then create a ban entry for each banned user
-showLists -> show banLists for this user and for this server
-
-ban list -> get a list of users banned on this server, and the list of users to ban. ban the ~union of these 2
-"""
