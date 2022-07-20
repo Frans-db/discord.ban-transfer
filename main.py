@@ -208,18 +208,6 @@ async def unbanList(ctx: Context, ban_list_id: str):
 async def ping(ctx: Context):
     await ctx.send(f'Pong! {bot.latency:.2f} seconds')
 
-
-@bot.command()
-@commands.is_owner()
-async def guildId(ctx: Context):
-    await ctx.send(f'Guild id: {ctx.guild.id}')
-
-
-@bot.command()
-@commands.is_owner()
-async def userId(ctx: Context):
-    await ctx.send(f'User id: {ctx.author.id}')
-
 if __name__ == '__main__':
     bot.run(TOKEN)
 
