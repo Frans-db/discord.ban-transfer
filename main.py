@@ -10,6 +10,8 @@ from discord.user import User
 
 from config.config import TOKEN
 
+table_format = 'github'
+
 bot = commands.Bot(command_prefix='!')
 conn = sqlite3.connect('database.db')
 cur = conn.cursor()
@@ -78,23 +80,20 @@ async def viewLists(ctx: Context):
     guild_lists = cur.fetchall()
 
     headers = ['Ban List Id', 'User', 'Guild', 'Time']
-    format = 'pipe'
-
-    message = ''
 
     table_data = []
     for (ban_list_id, user_id, guild_id, timestamp) in user_lists:
         guild = await bot.fetch_guild(guild_id)
         table_data.append([ban_list_id, ctx.author, guild, timestamp])
-    message += f'**Ban lists for user {ctx.author}**\n'
-    message += f"```{tabulate(table_data, headers=headers, tablefmt=format)}```\n"
+    message = f'**Ban lists for user {ctx.author}**\n'
+    message += f"```{tabulate(table_data, headers=headers, tablefmt=table_format)}```\n"
 
     table_data = []
     for (ban_list_id, user_id, guild_id, timestamp) in guild_lists:
         user = await bot.fetch_user(user_id)
         table_data.append([ban_list_id, user, ctx.guild, timestamp])
     message += f'**Ban lists for guild {ctx.guild}**\n'
-    message += f"```{tabulate(table_data, headers=headers, tablefmt=format)}```"
+    message += f"```{tabulate(table_data, headers=headers, tablefmt=table_format)}```"
 
     await ctx.send(message)
 
@@ -116,10 +115,15 @@ async def viewList(ctx: Context, ban_list_id: str):
     bans = cur.fetchall()
     user = await bot.fetch_user(user_id)
     guild = await bot.fetch_guild(guild_id)
-    message = f'Ban list created by **{user}** for server **{guild}** at time {timestamp} with {len(bans)} bans:\n'
+
+    headers = ['User', 'Reason']
+    table_data = []
     for id, ban_list_id, banned_user_id, reason in bans:
         banned_user = await bot.fetch_user(banned_user_id)
-        message += f'Banned **{banned_user}** for **{reason if reason else "No Reason Given"}**\n'
+        table_data.append([banned_user, reason if reason else "No Reason Given"])
+    message = f'Ban list created by **{user}** for server **{guild}** at time {timestamp} with {len(bans)} bans:\n'
+    message += f"```{tabulate(table_data, headers=headers, tablefmt=table_format)}```"
+    
     await ctx.send(message)
 # Helper commands
 
