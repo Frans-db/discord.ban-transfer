@@ -27,7 +27,7 @@ async def on_ready():
             user_id INTEGER,
             reason TEXT
         );''')
-    
+
     print('Initialisation done')
 
 
@@ -38,6 +38,7 @@ async def get_banned_list(ctx: Context):
 
 
 @bot.command()
+@commands.is_owner()
 async def createList(ctx: Context):
     bans = await get_banned_list(ctx)
 
@@ -55,7 +56,8 @@ async def createList(ctx: Context):
             ban.user.id,
             ban.reason,
         ))
-    cur.executemany('INSERT INTO bans (ban_list_id, user_id, reason) VALUES (?, ?, ?)', query_bans)
+    cur.executemany(
+        'INSERT INTO bans (ban_list_id, user_id, reason) VALUES (?, ?, ?)', query_bans)
 
     conn.commit()
 
@@ -63,6 +65,7 @@ async def createList(ctx: Context):
 
 
 @bot.command()
+@commands.is_owner()
 async def viewLists(ctx: Context):
     user_id = ctx.author.id
     guild_id = ctx.guild.id
@@ -86,10 +89,13 @@ async def viewLists(ctx: Context):
 
 
 @bot.command()
-async def get_bans(ctx: Context):
-    bans = await get_banned_list(ctx)
-    for ban in bans:
-        await ctx.send(f'{ban.user.id}, {ban.reason}')
+@commands.is_owner()
+async def viewList(ctx: Context, ban_list_id: str):
+    cur.execute('SELECT * FROM ban_lists WHERE id = ?', (ban_list_id, ))
+    ban_list = cur.fetchone()
+    print(ban_list)
+
+
 
 # Helper commands
 
