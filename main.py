@@ -13,7 +13,14 @@ from config.config import TOKEN
 table_format = 'github'
 max_bans = 1_000
 
-bot = commands.Bot(command_prefix=commands.when_mentioned)
+help_command = commands.DefaultHelpCommand(
+    no_category = 'Commands',
+)
+
+bot = commands.Bot(
+    command_prefix=commands.when_mentioned,
+    help_command=help_command
+)
 conn = sqlite3.connect('database.db')
 cur = conn.cursor()
 
