@@ -1,18 +1,13 @@
-import discord
+from discord.ext import commands
 
 from config.config import TOKEN
 
-client = discord.Client()
+bot = commands.Bot(command_prefix='!')
 
-@client.event
-async def on_ready():
-    pass
-
-
-@client.event
-async def on_message(message):
-    await message.channel.send('hi!')
+@bot.command()
+async def say(ctx, *, arg):
+    await ctx.send(arg)
 
 
 if __name__ == '__main__':
-    client.run(TOKEN)
+    bot.run(TOKEN)
