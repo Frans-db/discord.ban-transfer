@@ -11,6 +11,7 @@ from discord.user import User
 from config.config import TOKEN
 
 table_format = 'github'
+max_bans = 1_000
 
 bot = commands.Bot(command_prefix='!')
 conn = sqlite3.connect('database.db')
@@ -156,7 +157,7 @@ async def banList(ctx: Context, ban_list_id: str):
     server_bans = await get_banned_list(ctx)
     server_ban_ids = [ban.user.id for ban in server_bans]
     # get bans from the list that have not been banned on this server
-    filtered_bans = [ban for ban in bans if ban[2] not in server_ban_ids][:10000]
+    filtered_bans = [ban for ban in bans if ban[2] not in server_ban_ids][:max_bans]
     await ctx.send(f'Starting banning of {len(filtered_bans)} users.')
     for i, (ban_id, ban_list_id, banned_user_id, reason) in enumerate(filtered_bans):
         banned_user = await bot.fetch_user(banned_user_id)
@@ -187,7 +188,7 @@ async def unbanList(ctx: Context, ban_list_id: str):
     server_bans = await get_banned_list(ctx)
     server_ban_ids = [ban.user.id for ban in server_bans]
     # get bans from the list that have not been banned on this server
-    filtered_unbans = [ban for ban in bans if ban[2] in server_ban_ids][:10000]
+    filtered_unbans = [ban for ban in bans if ban[2] in server_ban_ids][:max_bans]
     await ctx.send(f'Starting unbanning of {len(filtered_unbans)} users.')
     for i, (ban_id, ban_list_id, banned_user_id, reason) in enumerate(filtered_unbans):
         banned_user = await bot.fetch_user(banned_user_id)
