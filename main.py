@@ -66,7 +66,7 @@ async def create(ctx: Context):
 
     conn.commit()
 
-    await ctx.send(f'User {ctx.author} created ban list ({ban_list_id}) for server {ctx.guild} with {len(query_bans)} users')
+    await ctx.send(f'User {ctx.author} created list ({ban_list_id}) for server {ctx.guild} with {len(query_bans)} users')
 
 
 @bot.command()
@@ -88,7 +88,7 @@ async def lists(ctx: Context):
         guild = await bot.fetch_guild(guild_id)
         table_data.append([ban_list_id, ctx.author, guild, timestamp])
     # append to message
-    message = f'**Ban lists for user {ctx.author}**\n'
+    message = f'**Lists for user {ctx.author}**\n'
     message += f"```{tabulate(table_data, headers=headers, tablefmt=table_format)}```\n"
     # create table data for the guild
     table_data = []
@@ -96,7 +96,7 @@ async def lists(ctx: Context):
         user = await bot.fetch_user(user_id)
         table_data.append([ban_list_id, user, ctx.guild, timestamp])
     # append to message
-    message += f'**Ban lists for guild {ctx.guild}**\n'
+    message += f'**Lists for guild {ctx.guild}**\n'
     message += f"```{tabulate(table_data, headers=headers, tablefmt=table_format)}```"
 
     await ctx.send(message)
@@ -110,12 +110,12 @@ async def view(ctx: Context, ban_list_id: str):
     ban_list = cur.fetchone()
     # check if list exists
     if ban_list is None:
-        await ctx.send(f'No ban list with id **{ban_list_id}** found')
+        await ctx.send(f'No list with id **{ban_list_id}** found')
         return
     ban_list_id, user_id, guild_id, timestamp = ban_list
     # check if either user made the list, or the list was made in this server
     if (user_id != ctx.author.id) and (guild_id != ctx.guild.id):
-        await ctx.send('Can\'t view ban lists that you didn\'t create or that weren\'t made in this server')
+        await ctx.send('Can\'t view lists that you didn\'t create or that weren\'t made in this server')
         return
     # get user who made the ban list and guild the ban list was made in
     user = await bot.fetch_user(user_id)
@@ -146,7 +146,7 @@ async def ban(ctx: Context, ban_list_id: str):
     ban_list = cur.fetchone()
     # check if list exists
     if ban_list is None:
-        await ctx.send(f'No ban list with id **{ban_list_id}** found')
+        await ctx.send(f'No list with id **{ban_list_id}** found')
         return
     ban_list_id, user_id, guild_id, timestamp = ban_list
     guild: Guild = ctx.guild
@@ -176,12 +176,13 @@ async def ban(ctx: Context, ban_list_id: str):
 @bot.command()
 @commands.is_owner()
 async def unban(ctx: Context, ban_list_id: str):
+    '''unban :D'''
     # get ban list from database
     cur.execute('SELECT * FROM ban_lists WHERE id = ?', (ban_list_id, ))
     ban_list = cur.fetchone()
     # check if list exists
     if ban_list is None:
-        await ctx.send(f'No ban list with id **{ban_list_id}** found')
+        await ctx.send(f'No list with id **{ban_list_id}** found')
         return
     ban_list_id, user_id, guild_id, timestamp = ban_list
     guild: Guild = ctx.guild
