@@ -160,6 +160,8 @@ async def ban(ctx: Context, ban_list_id: str):
     filtered_bans = [ban for ban in bans if ban[2]
                      not in server_ban_ids][:max_bans]
     await ctx.send(f'Starting banning of {len(filtered_bans)} users.')
+    if guild.id != guild_id and user_id != ctx.author.id:
+        await ctx.send('Not showing user names because list was not created by this user or on this server')
     for i, (ban_id, ban_list_id, banned_user_id, reason) in enumerate(filtered_bans):
         banned_user = await bot.fetch_user(banned_user_id)
         await guild.ban(user=banned_user, reason=reason)
@@ -193,6 +195,8 @@ async def unban(ctx: Context, ban_list_id: str):
     filtered_unbans = [ban for ban in bans if ban[2]
                        in server_ban_ids][:max_bans]
     await ctx.send(f'Starting unbanning of {len(filtered_unbans)} users.')
+    if guild.id != guild_id and user_id != ctx.author.id:
+        await ctx.send('Not showing user names because list was not created by this user or on this server')
     for i, (ban_id, ban_list_id, banned_user_id, reason) in enumerate(filtered_unbans):
         banned_user = await bot.fetch_user(banned_user_id)
         await guild.unban(user=banned_user, reason=reason)
