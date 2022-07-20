@@ -137,6 +137,68 @@ async def viewList(ctx: Context, ban_list_id: str):
     await ctx.send(message)
 
 
+@bot.command()
+@commands.is_owner()
+async def banList(ctx: Context, ban_list_id: str):
+    # get ban list from database
+    cur.execute('SELECT * FROM ban_lists WHERE id = ?', (ban_list_id, ))
+    ban_list = cur.fetchone()
+    # check if list exists
+    if ban_list is None:
+        await ctx.send(f'No ban list with id **{ban_list_id}** found')
+        return
+    ban_list_id, user_id, guild_id, timestamp = ban_list
+    guild: Guild = ctx.guild
+    # get bans from database
+    cur.execute('SELECT * FROM bans WHERE ban_list_id = ?', (ban_list_id, ))
+    bans = cur.fetchall()
+    # get bans for this server
+    server_bans = await get_banned_list(ctx)
+    server_ban_ids = [ban.user.id for ban in server_bans]
+    # get bans from the list that have not been banned on this server
+    filtered_bans = [ban for ban in bans if ban[2] not in server_ban_ids][:10000]
+    await ctx.send(f'Starting banning of {len(filtered_bans)} users.')
+    for i, (ban_id, ban_list_id, banned_user_id, reason) in enumerate(filtered_bans):
+        banned_user = await bot.fetch_user(banned_user_id)
+        await guild.ban(user=banned_user, reason=reason)
+        message = f'({i+1}/{len(filtered_bans)})'
+        # only reveal the name when the list was made in this guild or the user made the list
+        if guild.id == guild_id or user_id == ctx.author.id:
+            message += f' Banned **{banned_user}** for **{reason if reason else "No Reason Given"}**'
+        await ctx.send(message)
+    await ctx.send('Done banning')
+
+@bot.command()
+@commands.is_owner()
+async def unbanList(ctx: Context, ban_list_id: str):
+    # get ban list from database
+    cur.execute('SELECT * FROM ban_lists WHERE id = ?', (ban_list_id, ))
+    ban_list = cur.fetchone()
+    # check if list exists
+    if ban_list is None:
+        await ctx.send(f'No ban list with id **{ban_list_id}** found')
+        return
+    ban_list_id, user_id, guild_id, timestamp = ban_list
+    guild: Guild = ctx.guild
+    # get bans from database
+    cur.execute('SELECT * FROM bans WHERE ban_list_id = ?', (ban_list_id, ))
+    bans = cur.fetchall()
+    # get bans for this server
+    server_bans = await get_banned_list(ctx)
+    server_ban_ids = [ban.user.id for ban in server_bans]
+    # get bans from the list that have not been banned on this server
+    filtered_unbans = [ban for ban in bans if ban[2] in server_ban_ids][:10000]
+    await ctx.send(f'Starting unbanning of {len(filtered_unbans)} users.')
+    for i, (ban_id, ban_list_id, banned_user_id, reason) in enumerate(filtered_unbans):
+        banned_user = await bot.fetch_user(banned_user_id)
+        await guild.unban(user=banned_user, reason=reason)
+        message = f'({i+1}/{len(filtered_unbans)})'
+        # only reveal the name when the list was made in this guild or the user made the list
+        if guild.id == guild_id or user_id == ctx.author.id:
+            message += f' Unbanned **{banned_user}** with reason **{reason if reason else "No Reason Given"}**'
+        await ctx.send(message)
+    await ctx.send('Done unbanning')
+
 # Helper commands
 
 
