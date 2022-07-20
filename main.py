@@ -44,7 +44,7 @@ async def get_banned_list(ctx: Context):
 
 @bot.command()
 @commands.is_owner()
-async def createList(ctx: Context):
+async def create(ctx: Context):
     bans = await get_banned_list(ctx)
 
     ban_list_id = str(uuid.uuid4())[:8]
@@ -71,7 +71,7 @@ async def createList(ctx: Context):
 
 @bot.command()
 @commands.is_owner()
-async def viewLists(ctx: Context):
+async def lists(ctx: Context):
     # get context data
     user_id = ctx.author.id
     guild_id = ctx.guild.id
@@ -104,7 +104,7 @@ async def viewLists(ctx: Context):
 
 @bot.command()
 @commands.is_owner()
-async def viewList(ctx: Context, ban_list_id: str):
+async def view(ctx: Context, ban_list_id: str):
     # get ban list from database
     cur.execute('SELECT * FROM ban_lists WHERE id = ?', (ban_list_id, ))
     ban_list = cur.fetchone()
@@ -140,7 +140,7 @@ async def viewList(ctx: Context, ban_list_id: str):
 
 @bot.command()
 @commands.is_owner()
-async def banList(ctx: Context, ban_list_id: str):
+async def ban(ctx: Context, ban_list_id: str):
     # get ban list from database
     cur.execute('SELECT * FROM ban_lists WHERE id = ?', (ban_list_id, ))
     ban_list = cur.fetchone()
@@ -173,7 +173,7 @@ async def banList(ctx: Context, ban_list_id: str):
 
 @bot.command()
 @commands.is_owner()
-async def unbanList(ctx: Context, ban_list_id: str):
+async def unban(ctx: Context, ban_list_id: str):
     # get ban list from database
     cur.execute('SELECT * FROM ban_lists WHERE id = ?', (ban_list_id, ))
     ban_list = cur.fetchone()
