@@ -13,7 +13,7 @@ from config.config import TOKEN
 table_format = 'github'
 max_bans = 1_000
 
-bot = commands.Bot(command_prefix='bantransfer')
+bot = commands.Bot(command_prefix=commands.when_mentioned)
 conn = sqlite3.connect('database.db')
 cur = conn.cursor()
 
@@ -45,6 +45,7 @@ async def get_banned_list(ctx: Context):
 @bot.command()
 @commands.is_owner()
 async def create(ctx: Context):
+    '''Create a list of banned users for the current server'''
     bans = await get_banned_list(ctx)
 
     ban_list_id = str(uuid.uuid4())[:8]
@@ -72,6 +73,7 @@ async def create(ctx: Context):
 @bot.command()
 @commands.is_owner()
 async def lists(ctx: Context):
+    '''Show lists created by you or created in this server'''
     # get context data
     user_id = ctx.author.id
     guild_id = ctx.guild.id
@@ -105,6 +107,7 @@ async def lists(ctx: Context):
 @bot.command()
 @commands.is_owner()
 async def view(ctx: Context, ban_list_id: str):
+    '''Show banned users in a list'''
     # get ban list from database
     cur.execute('SELECT * FROM ban_lists WHERE id = ?', (ban_list_id, ))
     ban_list = cur.fetchone()
@@ -141,6 +144,7 @@ async def view(ctx: Context, ban_list_id: str):
 @bot.command()
 @commands.is_owner()
 async def ban(ctx: Context, ban_list_id: str):
+    '''Ban users in a list'''
     # get ban list from database
     cur.execute('SELECT * FROM ban_lists WHERE id = ?', (ban_list_id, ))
     ban_list = cur.fetchone()
@@ -176,7 +180,7 @@ async def ban(ctx: Context, ban_list_id: str):
 @bot.command()
 @commands.is_owner()
 async def unban(ctx: Context, ban_list_id: str):
-    '''unban :D'''
+    '''Unban users in a list'''
     # get ban list from database
     cur.execute('SELECT * FROM ban_lists WHERE id = ?', (ban_list_id, ))
     ban_list = cur.fetchone()
@@ -214,6 +218,7 @@ async def unban(ctx: Context, ban_list_id: str):
 @bot.command()
 @commands.is_owner()
 async def ping(ctx: Context):
+    '''Show bot latency'''
     await ctx.send(f'Pong! {bot.latency:.2f} seconds')
 
 if __name__ == '__main__':

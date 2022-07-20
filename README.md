@@ -23,17 +23,19 @@ Because this bot has the ability to ban many users currently only the server own
 
 Commands:
 
-`bantransfer help` - Display a help menu in discord
+`@bantransfer help` - Display a help menu in discord
 
-`bantransfer create` - Create a list of banned users for the current server
+`@bantransfer create` - Create a list of banned users for the current server
 
-`bantransfer lists` - Show lists created by this user or created in this server
+`@bantransfer lists` - Show lists created by this user or created in this server
 
-`bantransfer view {list id}` - Show banned users in a list
+`@bantransfer view {list id}` - Show banned users in a list
 
-`bantransfer ban {list id}` - Ban users in a list
+`@bantransfer ban {list id}` - Ban users in a list
 
-`bantransfer unban {list id}` - Unban users in a list
+`@bantransfer unban {list id}` - Unban users in a list
+
+`@bantransfer ping` - Show bot latency
 
 ## Contact
 Having any issues with this bot, or do you have ideas for other bots and projects? Feel free to send me a discord dm [Frans#5292](https://discord.com/users/235080247194812416)
