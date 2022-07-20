@@ -1,5 +1,7 @@
+from email import header
 import sqlite3
 import uuid
+from tabulate import tabulate
 
 from discord.ext import commands
 from discord.ext.commands.context import Context
@@ -75,16 +77,25 @@ async def viewLists(ctx: Context):
     cur.execute('SELECT * FROM ban_lists WHERE guild_id = ?', (guild_id, ))
     guild_lists = cur.fetchall()
 
-    message = f'**Ban lists for user {ctx.author}**\n'
+    headers = ['Ban List Id', 'User', 'Guild', 'Time']
+    format = 'pipe'
+
+    message = ''
+
+    table_data = []
     for (ban_list_id, user_id, guild_id, timestamp) in user_lists:
         guild = await bot.fetch_guild(guild_id)
-        message += f'{ban_list_id}, {ctx.author}, {guild}, {timestamp}\n'
-    await ctx.send(message)
+        table_data.append([ban_list_id, ctx.author, guild, timestamp])
+    message += f'**Ban lists for user {ctx.author}**\n'
+    message += f"```{tabulate(table_data, headers=headers, tablefmt=format)}```\n"
 
-    message = f'**Ban lists for guild {ctx.guild}**\n'
+    table_data = []
     for (ban_list_id, user_id, guild_id, timestamp) in guild_lists:
         user = await bot.fetch_user(user_id)
-        message += f'{ban_list_id}, {user}, {ctx.guild}, {timestamp}\n'
+        table_data.append([ban_list_id, user, ctx.guild, timestamp])
+    message += f'**Ban lists for guild {ctx.guild}**\n'
+    message += f"```{tabulate(table_data, headers=headers, tablefmt=format)}```"
+
     await ctx.send(message)
 
 
