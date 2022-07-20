@@ -12,7 +12,7 @@ If you would rather host the bot yourself the next section explains how to do th
    git clone git@github.com:Frans-db/discord.ban-transfer.git
    ```
 2. Create an application + bot at https://discord.com/developers/applications (For more info see https://discordpy.readthedocs.io/en/stable/discord.html)
-3. Enter your application token in `config/config.py`
+3. Create a config file `config/config.py` and enter your application token
    ```python
    TOKEN = 'ENTER YOUR TOKEN'
    ```
